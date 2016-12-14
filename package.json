@@ -7,6 +7,10 @@
   "dependencies": {
     "stream-collect": "^1.3.1"
   },
+  "keywords": [
+    "hyperdrive",
+    "P2P"
+  ],
   "repository": "poga/hyperdrive-ln",
   "devDependencies": {
     "hyperdrive": "^7.12.1",
