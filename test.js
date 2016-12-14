@@ -42,6 +42,21 @@ tape('resolve', function (t) {
   })
 })
 
+tape('resolve to file without link', function (t) {
+  var drive = hyperdrive(memdb())
+  var archive = drive.createArchive()
+  write('baz').pipe(archive.createFileWriteStream('/foo/link')).on('finish', test)
+
+  function test () {
+    ln.resolve(archive, '/foo/link', (err, link, nextPath) => {
+      t.error(err)
+      t.same(link, archive.key)
+      t.same(nextPath, '')
+      t.end()
+    })
+  }
+})
+
 tape('unresolvable not exists', function (t) {
   var drive = hyperdrive(memdb())
   var archive = drive.createArchive()

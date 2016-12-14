@@ -45,6 +45,9 @@ function resolve (archive, path, cb) {
       if (exist(entries, partialPath)) {
         readlink(archive, partialPath.join('/'), (err, link) => {
           if (err && err.message === 'not a link') {
+            if (i === components.length-1) {
+              return cb(null, archive.key, '')
+            }
             return cb(new Error(`unresolvable at ${partialPath.join('/')}`))
           }
           if (err) return cb(err)
