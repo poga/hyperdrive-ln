@@ -32,7 +32,7 @@ function link (archive, entry, destArchiveKey, cb) {
   s.pipe(w).on('finish', cb)
 }
 
-function resolve (drive, archive, path, cb) {
+function resolve (archive, path, cb) {
   var components = path.split('/')
   var partialPath = []
   var found = false
@@ -43,13 +43,13 @@ function resolve (drive, archive, path, cb) {
       partialPath.push(c)
 
       if (exist(entries, partialPath)) {
-        read(drive, archive, partialPath.join('/'), (err, linkedArchive) => {
+        readlink(archive, partialPath.join('/'), (err, link) => {
           if (err && err.message === 'not a link') {
             return cb(new Error(`unresolvable at ${partialPath.join('/')}`))
           }
           if (err) return cb(err)
 
-          return cb(null, linkedArchive, components.slice(i + 1).join('/'))
+          return cb(null, link, components.slice(i + 1).join('/'))
         })
         found = true
         break

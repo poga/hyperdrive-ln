@@ -27,16 +27,14 @@ tape('resolve', function (t) {
   var drive = hyperdrive(memdb())
   var archive = drive.createArchive()
 
-  var drive2 = hyperdrive(memdb())
-
   var linkedArchive = drive.createArchive({live: false})
   linkedArchive.finalize(() => {
     ln.link(archive, '/foo/link', linkedArchive.key, err => {
       t.error(err)
 
-      ln.resolve(drive2, archive, '/foo/link/bar/baz.txt', (err, nextArchive, nextPath) => {
+      ln.resolve(archive, '/foo/link/bar/baz.txt', (err, link, nextPath) => {
         t.error(err)
-        t.same(nextArchive.key, linkedArchive.key)
+        t.same(link, linkedArchive.key.toString('hex'))
         t.same(nextPath, 'bar/baz.txt')
         t.end()
       })
@@ -48,7 +46,7 @@ tape('unresolvable not exists', function (t) {
   var drive = hyperdrive(memdb())
   var archive = drive.createArchive()
 
-  ln.resolve(drive, archive, '/foo/link/bar/baz.txt', (err, nextArchive, nextPath) => {
+  ln.resolve(archive, '/foo/link/bar/baz.txt', (err, link, nextPath) => {
     t.same(err.message, 'unresolvable path /foo/link/bar/baz.txt')
     t.end()
   })
@@ -61,7 +59,7 @@ tape('unresolvable not link', function (t) {
   write('baz').pipe(archive.createFileWriteStream('/foo/link')).on('finish', test)
 
   function test () {
-    ln.resolve(drive, archive, '/foo/link/bar/baz.txt', (err, nextArchive, nextPath) => {
+    ln.resolve(archive, '/foo/link/bar/baz.txt', (err, link, nextPath) => {
       t.same(err.message, 'unresolvable at /foo/link')
       t.end()
     })
