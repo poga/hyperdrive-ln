@@ -1,24 +1,26 @@
-const collect = require('stream-collect')
+const collect = require('collect-stream')
 const Readable = require('stream').Readable
 
-module.exports = {read, readlink, link}
+module.exports = {read, readlink, link, resolve}
 
 function readlink (archive, entry, cb) {
-  collect(archive.createFileReadStream(entry), body => {
+  collect(archive.createFileReadStream(entry), (err, body) => {
+    if (err) return cb(err, null)
+    var l
     try {
-      var l = decode(body)
-      if (!l) return cb(new Error('no link found'))
-      cb(null, l)
+      l = decode(body)
     } catch (e) {
-      cb(e)
+      return cb(new Error('not a link'), null)
     }
+    if (!l) return cb(new Error('not a link'), null)
+    cb(null, l)
   })
 }
 
 function read (drive, archive, entry, cb) {
-  readlink(archive, entry, (err, info) => {
+  readlink(archive, entry, (err, key) => {
     if (err) return cb(err)
-    cb(null, drive.createArchive(info))
+    cb(null, drive.createArchive(key))
   })
 }
 
@@ -30,7 +32,44 @@ function link (archive, entry, destArchiveKey, cb) {
   s.pipe(w).on('finish', cb)
 }
 
+function resolve (drive, archive, path, cb) {
+  var components = path.split('/')
+  var partialPath = []
+  var found = false
+  archive.list((err, entries) => {
+    if (err) return cb(err)
+    for (var i = 0; i < components.length; i++) {
+      var c = components[i]
+      partialPath.push(c)
+
+      if (exist(entries, partialPath)) {
+        read(drive, archive, partialPath.join('/'), (err, linkedArchive) => {
+          if (err && err.message === 'not a link') {
+            return cb(new Error(`unresolvable at ${partialPath.join('/')}`))
+          }
+          if (err) return cb(err)
+
+          return cb(null, linkedArchive, components.slice(i + 1).join('/'))
+        })
+        found = true
+        break
+      }
+    }
+
+    if (!found) {
+      cb(new Error(`unresolvable path ${path}`))
+    }
+  })
+
+  function exist (entries, partialPath) {
+    if (entries.find(x => x.name === partialPath.join('/'))) return true
+
+    return false
+  }
+}
+
 function encode (destKey) {
+  if (destKey instanceof Buffer) return JSON.stringify({l: destKey.toString('hex')})
   return JSON.stringify({l: destKey})
 }
 

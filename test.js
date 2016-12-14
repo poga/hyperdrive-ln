@@ -1,6 +1,7 @@
 const tape = require('tape')
 const memdb = require('memdb')
 const hyperdrive = require('hyperdrive')
+const Readable = require('stream').Readable
 
 const ln = require('.')
 
@@ -21,3 +22,55 @@ tape('link', function (t) {
     })
   })
 })
+
+tape('resolve', function (t) {
+  var drive = hyperdrive(memdb())
+  var archive = drive.createArchive()
+
+  var drive2 = hyperdrive(memdb())
+
+  var linkedArchive = drive.createArchive({live: false})
+  linkedArchive.finalize(() => {
+    ln.link(archive, '/foo/link', linkedArchive.key, err => {
+      t.error(err)
+
+      ln.resolve(drive2, archive, '/foo/link/bar/baz.txt', (err, nextArchive, nextPath) => {
+        t.error(err)
+        t.same(nextArchive.key, linkedArchive.key)
+        t.same(nextPath, 'bar/baz.txt')
+        t.end()
+      })
+    })
+  })
+})
+
+tape('unresolvable not exists', function (t) {
+  var drive = hyperdrive(memdb())
+  var archive = drive.createArchive()
+
+  ln.resolve(drive, archive, '/foo/link/bar/baz.txt', (err, nextArchive, nextPath) => {
+    t.same(err.message, 'unresolvable path /foo/link/bar/baz.txt')
+    t.end()
+  })
+})
+
+tape('unresolvable not link', function (t) {
+  var drive = hyperdrive(memdb())
+  var archive = drive.createArchive()
+
+  write('baz').pipe(archive.createFileWriteStream('/foo/link')).on('finish', test)
+
+  function test () {
+    ln.resolve(drive, archive, '/foo/link/bar/baz.txt', (err, nextArchive, nextPath) => {
+      t.same(err.message, 'unresolvable at /foo/link')
+      t.end()
+    })
+  }
+})
+
+function write (str) {
+  var s = new Readable()
+  s.push(str)
+  s.push(null)
+  return s
+}
