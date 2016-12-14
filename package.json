@@ -1,5 +1,6 @@
 {
   "name": "hyperdrive-ln",
+  "description": "create symlink between hyperdrives",
   "author": "Poga Po<poga.bahamut@gmail.com>",
   "version": "1.0.0",
   "main": "index.js",
