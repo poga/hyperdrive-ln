@@ -1,7 +1,7 @@
 const collect = require('collect-stream')
 const Readable = require('stream').Readable
 
-module.exports = {read, readlink, link, resolve}
+module.exports = {readlink, link, resolve}
 
 function readlink (archive, entry, cb) {
   collect(archive.createFileReadStream(entry), (err, body) => {
@@ -14,13 +14,6 @@ function readlink (archive, entry, cb) {
     }
     if (!l) return cb(new Error('not a link'), null)
     cb(null, l)
-  })
-}
-
-function read (drive, archive, entry, cb) {
-  readlink(archive, entry, (err, key) => {
-    if (err) return cb(err)
-    cb(null, drive.createArchive(key))
   })
 }
 
@@ -45,7 +38,7 @@ function resolve (archive, path, cb) {
       if (exist(entries, partialPath)) {
         readlink(archive, partialPath.join('/'), (err, link) => {
           if (err && err.message === 'not a link') {
-            if (i === components.length-1) {
+            if (i === components.length - 1) {
               return cb(null, archive.key, '')
             }
             return cb(new Error(`unresolvable at ${partialPath.join('/')}`))
