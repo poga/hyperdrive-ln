@@ -7,9 +7,6 @@ create symbolic link between [hyperdrives](https://github.com/mafintosh/hyperdri
 ## Usage
 
 ```js
-const tape = require('tape')
-const memdb = require('memdb')
-const hyperdrive = require('hyperdrive')
 const ln = require('hyperdrive-ln')
 
 var drive = hyperdrive(memdb())
