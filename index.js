@@ -1,7 +1,7 @@
 const collect = require('collect-stream')
 const Readable = require('stream').Readable
 
-module.exports = {readlink, link, resolve}
+module.exports = {readlink, link, resolve, encode, decode}
 
 function readlink (archive, entry, cb) {
   collect(archive.createFileReadStream(entry), (err, body) => {
