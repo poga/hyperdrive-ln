@@ -2,6 +2,7 @@ const tape = require('tape')
 const memdb = require('memdb')
 const hyperdrive = require('hyperdrive')
 const Readable = require('stream').Readable
+const collect = require('collect-stream')
 
 const ln = require('.')
 
@@ -18,6 +19,29 @@ tape('link', function (t) {
         t.error(err)
         t.same(info, 'foo')
         t.end()
+      })
+    })
+  })
+})
+
+tape('link with metadata', function (t) {
+  var drive = hyperdrive(memdb())
+  var archive = drive.createArchive()
+
+  ln.link(archive, 'symlink', 'foo', {bar: 'baz'}, () => {
+    archive.list((err, entries) => {
+      t.error(err)
+      t.same(entries[0].name, 'symlink')
+
+      ln.readlink(archive, entries[0], (err, key) => {
+        t.error(err)
+        t.same(key, 'foo')
+
+        collect(archive.createFileReadStream(entries[0]), (err, data) => {
+          t.error(err)
+          t.same(JSON.parse(data), {l: 'foo', meta: {bar: 'baz'}})
+          t.end()
+        })
       })
     })
   })

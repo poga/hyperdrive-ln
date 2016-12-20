@@ -17,9 +17,13 @@ function readlink (archive, entry, cb) {
   })
 }
 
-function link (archive, entry, destArchiveKey, cb) {
+function link (archive, entry, destArchiveKey, meta, cb) {
+  if (typeof meta === 'function') {
+    cb = meta
+    meta = undefined
+  }
   var s = new Readable()
-  s.push(encode(destArchiveKey))
+  s.push(encode(destArchiveKey, meta))
   s.push(null)
   var w = archive.createFileWriteStream(entry)
   s.pipe(w).on('finish', cb)
@@ -64,9 +68,11 @@ function resolve (archive, path, cb) {
   }
 }
 
-function encode (destKey) {
+function encode (destKey, meta) {
   if (destKey instanceof Buffer) return JSON.stringify({l: destKey.toString('hex')})
-  return JSON.stringify({l: destKey})
+  var body = {l: destKey}
+  if (meta) body.meta = meta
+  return JSON.stringify(body)
 }
 
 function decode (b) {
