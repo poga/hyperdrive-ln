@@ -17,4 +17,7 @@ ln.readlink(archive, 'linkfile', cb) // get linked archive key
 
 // assume link(archive, 'path/to/file', <ARCHIVE KEY>)
 ln.resolve(archive, 'path/to/file/within/linked/archive', cb) // returns (err, <ARCHIVE KEY>, 'within/linked/archive')
+
+ln.encode(key) // encode a key for linkfile
+ln.decode(data) // decode a linkfile content to key
 ```
