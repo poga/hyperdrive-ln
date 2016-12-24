@@ -43,11 +43,11 @@ Resolve a path.
 * If there's a symlink encountered in the path. `cb(err, archiveKey, restOfThePath)` will be invoked.
 * If there's no symlink in the path, `cb(err, archive.key, '')` will be called.
 
-#### `ln.encode(key, [meta])`
+#### `body = ln.encode(key, [meta])`
 
 Encode a key to symlink file body.
 
-#### `ln.decode(data)`
+#### `ln.decode(body)`
 
 Decode a symlink file body to linked archive key.
 
