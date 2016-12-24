@@ -40,8 +40,19 @@ Get the archiveKey stored inside a symlink
 
 Resolve a path.
 
-* If there's a symlink encountered in the path. `cb(err, archiveKey, restOfThePath)` will be invoked.
+* If there's a symlink encountered in the path. `cb(err, linkKey, restOfThePath)` will be invoked.
 * If there's no symlink in the path, `cb(err, archive.key, '')` will be called.
+
+for example:
+
+```js
+link(archive, 'foo/bar', '<LINK_KEY>', (err) => {
+    ln.resolve(archive, 'foo/bar/baz', (err, link, path) => {
+      // link === '<LINK_KEY>'
+      // path === 'baz'
+    })
+})
+```
 
 #### `body = ln.encode(key, [meta])`
 
