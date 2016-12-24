@@ -39,7 +39,7 @@ tape('link with metadata', function (t) {
 
         collect(archive.createFileReadStream(entries[0]), (err, data) => {
           t.error(err)
-          t.same(JSON.parse(data), {l: 'foo', meta: {bar: 'baz'}})
+          t.same(JSON.parse(data), {'$$hdln$$': 'foo', meta: {bar: 'baz'}})
           t.end()
         })
       })

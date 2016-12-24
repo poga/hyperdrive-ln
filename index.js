@@ -6,14 +6,14 @@ module.exports = {readlink, link, resolve, encode, decode}
 function readlink (archive, entry, cb) {
   collect(archive.createFileReadStream(entry), (err, body) => {
     if (err) return cb(err, null)
-    var l
+    var link
     try {
-      l = decode(body)
+      link = decode(body)
     } catch (e) {
       return cb(new Error('not a link'), null)
     }
-    if (!l) return cb(new Error('not a link'), null)
-    cb(null, l)
+    if (!link) return cb(new Error('not a link'), null)
+    cb(null, link)
   })
 }
 
@@ -69,12 +69,14 @@ function resolve (archive, path, cb) {
 }
 
 function encode (destKey, meta) {
-  if (destKey instanceof Buffer) return JSON.stringify({l: destKey.toString('hex')})
-  var body = {l: destKey}
+  if (destKey instanceof Buffer) return encode(destKey.toString('hex'), meta)
+  var body = {'$$hdln$$': destKey}
   if (meta) body.meta = meta
   return JSON.stringify(body)
 }
 
 function decode (b) {
-  return JSON.parse(b).l
+  var link = JSON.parse(b)['$$hdln$$']
+  if (!link) throw new Error('not a link')
+  return link
 }
