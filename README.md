@@ -20,7 +20,7 @@ ln.readlink(archive, 'linkfile', cb) // get linked archive key
 // assume link(archive, 'path/to/file', <ARCHIVE KEY>)
 ln.resolve(archive, 'path/to/file/within/linked/archive', cb) // returns (err, <ARCHIVE KEY>, 'within/linked/archive')
 
-ln.encode(key) // encode a key for linkfile
+ln.encode(key, [meta]) // encode a key for linkfile
 ln.decode(data) // decode a linkfile content to key
 ```
 
@@ -43,14 +43,13 @@ Resolve a path.
 * If there's a symlink encountered in the path. `cb(err, archiveKey, restOfThePath)` will be invoked.
 * If there's no symlink in the path, `cb(err, archive.key, '')` will be called.
 
-#### `ln.encode(key)`
+#### `ln.encode(key, [meta])`
 
 Encode a key to symlink file body.
 
 #### `ln.decode(data)`
 
 Decode a symlink file body to linked archive key.
-
 
 ## License
 
