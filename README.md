@@ -17,7 +17,7 @@ var archive = drive.createArchive()
 ln.link(archive, 'linkfile', <ARCHIVE KEY>, [meta], cb) // create symlink to another archive
 ln.readlink(archive, 'linkfile', cb) // get linked archive key
 
-// assume link(archive, 'path/to/file', <ARCHIVE KEY>)
+// assume ln.link(archive, 'path/to/file', <ARCHIVE KEY>)
 ln.resolve(archive, 'path/to/file/within/linked/archive', cb) // returns (err, <ARCHIVE KEY>, 'within/linked/archive')
 
 ln.encode(key, [meta]) // encode a key for linkfile
@@ -46,7 +46,7 @@ Resolve a path.
 for example:
 
 ```js
-link(archive, 'foo/bar', '<LINK_KEY>', (err) => {
+ln.link(archive, 'foo/bar', '<LINK_KEY>', (err) => {
     ln.resolve(archive, 'foo/bar/baz', (err, link, path) => {
       // link === '<LINK_KEY>'
       // path === 'baz'
