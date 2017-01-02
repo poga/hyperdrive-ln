@@ -20,6 +20,9 @@ ln.readlink(archive, 'linkfile', cb) // get linked archive key
 // assume ln.link(archive, 'path/to/file', <ARCHIVE KEY>)
 ln.resolve(archive, 'path/to/file/within/linked/archive', cb) // returns (err, <ARCHIVE KEY>, 'within/linked/archive')
 
+// resolve through archives
+ln.deepResolve(drive, swarmer, archive, path, cb)
+
 ln.encode(key, [meta]) // encode a key for linkfile
 ln.decode(data) // decode a linkfile content to key
 ```
@@ -53,6 +56,48 @@ ln.link(archive, 'foo/bar', '<LINK_KEY>', (err) => {
     })
 })
 ```
+
+#### `ln.deepResolve(drive, swarmer, archive, path, cb)`
+
+Recursively resolve a path through archives. Create swarm connection when necessary.
+
+`swarmer` is anything let you join swarm . For example: [hyperdiscovery](https://github.com/karissa/hyperdiscovery).
+
+callback `cb(err, result)`. `result` is a recursive structure:
+```js
+{
+  archive: // traversed archive,
+  path: // consumed path,
+  swarm: // swarm instance,
+  next: result // next component if there's one
+}
+```
+
+For example: Assume we have an `archive1` which `/foo/bar` linked to `archive2`.
+
+```js
+ln.deepResolve(drive, swarmer, archive1, '/foo/bar/baz/baz.txt', cb)
+```
+
+will get the result:
+
+```js
+{
+  archive: archive1,
+  path: '/foo/bar',
+  swarm: // a swarm instance,
+  next: {
+    archive: archive2,
+    path: 'baz/baz.txt',
+    swarm: // another swarm instance
+  }
+}
+```
+use `deepClose(result)` to close all swarm instance in the result.
+
+#### `ln.deepClose(result)`
+
+Close all swarm instance in the result.
 
 #### `body = ln.encode(key, [meta])`
 

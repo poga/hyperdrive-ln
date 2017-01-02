@@ -4,7 +4,7 @@ const hyperdrive = require('hyperdrive')
 const Readable = require('stream').Readable
 const collect = require('collect-stream')
 
-const ln = require('.')
+const ln = require('..')
 
 tape('link', function (t) {
   var drive = hyperdrive(memdb())

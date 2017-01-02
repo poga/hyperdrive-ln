@@ -1,7 +1,7 @@
 const collect = require('collect-stream')
 const Readable = require('stream').Readable
 
-module.exports = {readlink, link, resolve, encode, decode}
+module.exports = {readlink, link, resolve, encode, decode, deepResolve, deepClose}
 
 function readlink (archive, entry, cb) {
   collect(archive.createFileReadStream(entry), (err, body) => {
@@ -43,6 +43,7 @@ function resolve (archive, path, cb) {
         readlink(archive, partialPath.join('/'), (err, link) => {
           if (err && err.message === 'not a link') {
             if (i === components.length - 1) {
+              // found the file
               return cb(null, archive.key.toString('hex'), '')
             }
             return cb(new Error(`unresolvable at ${partialPath.join('/')}`))
@@ -66,6 +67,41 @@ function resolve (archive, path, cb) {
 
     return false
   }
+}
+
+function deepResolve (drive, swarmer, archive, path, cb) {
+  _resolve(archive, path, cb)
+
+  function _resolve (archive, path, cb) {
+    var swarm = swarmer(archive)
+    resolve(archive, path, (err, nextArchiveKey, nextPath) => {
+      // must return result: swarm need to be closed
+      var result = {archive, path, swarm}
+      if (err) {
+        return cb(err, result)
+      }
+      if (nextPath === '') return cb(null, result)
+
+      var nextArchive = drive.createArchive(nextArchiveKey, {sparse: true})
+
+      _resolve(nextArchive, nextPath, (err, resolved) => {
+        console.log('nextPath', nextPath)
+        cb(err, {
+          archive,
+          swarm,
+          path: path.replace(new RegExp(`\/${nextPath.replace('/', '\/')}$`), ''), // eslint-disable-line no-useless-escape
+          next: resolved
+        })
+      })
+    })
+  }
+}
+
+function deepClose (deepResolveResult) {
+  if (!(deepResolveResult && deepResolveResult.swarm)) return
+
+  deepResolveResult.swarm.close()
+  deepClose(deepResolveResult.next)
 }
 
 function encode (destKey, meta) {
