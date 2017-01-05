@@ -75,7 +75,7 @@ tape('resolve to file without link', function (t) {
     ln.resolve(archive, '/foo/link', (err, link, nextPath) => {
       t.error(err)
       t.same(link, archive.key.toString('hex'))
-      t.same(nextPath, '')
+      t.same(nextPath, '/foo/link')
       t.end()
     })
   }

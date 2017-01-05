@@ -41,10 +41,10 @@ Get the archiveKey stored inside a symlink
 
 #### `ln.resolve(archive, path, cb)`
 
-Resolve a path.
+Resolve a path. Returns an archive and a path within that archive with `cb(err, linkedArchiveKey, pathWithinLinkedArchive)`
 
-* If there's a symlink encountered in the path. `cb(err, linkKey, restOfThePath)` will be invoked.
-* If there's no symlink in the path, `cb(err, archive.key, '')` will be called.
+* If there's a symlink encountered in the path. `cb(err, linkKey, pathWithinLinkedArchive)` will be invoked.
+* If there's no symlink in the path, `cb(err, archive.key, path)` will be called.
 
 for example:
 

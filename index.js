@@ -44,7 +44,7 @@ function resolve (archive, path, cb) {
           if (err && err.message === 'not a link') {
             if (i === components.length - 1) {
               // found the file
-              return cb(null, archive.key.toString('hex'), '')
+              return cb(null, archive.key.toString('hex'), partialPath.join('/'))
             }
             return cb(new Error(`unresolvable at ${partialPath.join('/')}`))
           }
