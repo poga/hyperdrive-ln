@@ -85,7 +85,6 @@ function deepResolve (drive, swarmer, archive, path, cb) {
       var nextArchive = drive.createArchive(nextArchiveKey, {sparse: true})
 
       _resolve(nextArchive, nextPath, (err, resolved) => {
-        console.log('nextPath', nextPath)
         cb(err, {
           archive,
           swarm,
