@@ -80,7 +80,7 @@ function deepResolve (drive, swarmer, archive, path, cb) {
       if (err) {
         return cb(err, result)
       }
-      if (nextPath === '') return cb(null, result)
+      if (nextPath === path) return cb(null, result)
 
       var nextArchive = drive.createArchive(nextArchiveKey, {sparse: true})
 
