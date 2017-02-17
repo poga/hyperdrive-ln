@@ -1,5 +1,6 @@
 const collect = require('collect-stream')
 const Readable = require('stream').Readable
+const pump = require('pump')
 
 module.exports = {readlink, link, resolve, encode, decode, deepResolve, deepClose}
 
@@ -26,7 +27,7 @@ function link (archive, entry, destArchiveKey, meta, cb) {
   s.push(encode(destArchiveKey, meta))
   s.push(null)
   var w = archive.createFileWriteStream(entry)
-  s.pipe(w).on('finish', cb)
+  pump(s, w, cb)
 }
 
 function resolve (archive, path, cb) {

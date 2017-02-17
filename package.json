@@ -6,7 +6,8 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "collect-stream": "^1.2.1"
+    "collect-stream": "^1.2.1",
+    "pump": "^1.0.2"
   },
   "keywords": [
     "hyperdrive",

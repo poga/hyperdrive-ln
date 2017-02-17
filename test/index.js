@@ -10,7 +10,9 @@ tape('link', function (t) {
   var drive = hyperdrive(memdb())
   var archive = drive.createArchive()
 
-  ln.link(archive, 'symlink', 'foo', () => {
+  ln.link(archive, 'symlink', 'foo', err => {
+    t.error(err)
+
     archive.list((err, entries) => {
       t.error(err)
       t.same(entries[0].name, 'symlink')
@@ -28,7 +30,9 @@ tape('link with metadata', function (t) {
   var drive = hyperdrive(memdb())
   var archive = drive.createArchive()
 
-  ln.link(archive, 'symlink', 'foo', {bar: 'baz'}, () => {
+  ln.link(archive, 'symlink', 'foo', {bar: 'baz'}, err => {
+    t.error(err)
+
     archive.list((err, entries) => {
       t.error(err)
       t.same(entries[0].name, 'symlink')
