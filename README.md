@@ -14,14 +14,14 @@ const ln = require('hyperdrive-ln')
 var drive = hyperdrive(memdb())
 var archive = drive.createArchive()
 
-ln.link(archive, 'linkfile', <ARCHIVE KEY>, [meta], cb) // create symlink to another archive
-ln.readlink(archive, 'linkfile', cb) // get linked archive key
+ln.link(archive, 'linkfile', <ARCHIVE KEY>, [meta], err => {}) // create symlink to another archive
+ln.readlink(archive, 'linkfile', (err, info) => {}) // get linked archive key
 
 // assume ln.link(archive, 'path/to/file', <ARCHIVE KEY>)
-ln.resolve(archive, 'path/to/file/within/linked/archive', cb) // returns (err, <ARCHIVE KEY>, 'within/linked/archive')
+ln.resolve(archive, 'path/to/file/within/linked/archive', (err, archiveKey, restOfThePath)) // returns (err, <ARCHIVE KEY>, 'within/linked/archive')
 
 // resolve through archives
-ln.deepResolve(drive, swarmer, archive, path, cb)
+ln.deepResolve(drive, swarmer, archive, path, (err, result) => {})
 
 ln.encode(key, [meta]) // encode a key for linkfile
 ln.decode(data) // decode a linkfile content to key
@@ -63,7 +63,7 @@ Recursively resolve a path through archives. Create swarm connection when necess
 
 `swarmer` is anything let you join swarm . For example: [hyperdiscovery](https://github.com/karissa/hyperdiscovery).
 
-callback `cb(err, result)`. `result` is a recursive structure:
+callback `cb(err, result)` where `result` is a recursive structure:
 ```js
 {
   archive: // traversed archive,
