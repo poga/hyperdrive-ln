@@ -15,10 +15,10 @@ var drive = hyperdrive(memdb())
 var archive = drive.createArchive()
 
 ln.link(archive, 'linkfile', <ARCHIVE KEY>, [meta], err => {}) // create symlink to another archive
-ln.readlink(archive, 'linkfile', (err, info) => {}) // get linked archive key
+ln.readlink(archive, 'linkfile', (err, link) => {}) // get link data
 
 // assume ln.link(archive, 'path/to/file', <ARCHIVE KEY>)
-ln.resolve(archive, 'path/to/file/within/linked/archive', (err, archiveKey, restOfThePath)) // returns (err, <ARCHIVE KEY>, 'within/linked/archive')
+ln.resolve(archive, 'path/to/file/within/linked/archive', (err, link, restOfThePath)) // returns (err, {link: <ARCHIVE_KEY>, meta: {...}}, 'within/linked/archive')
 
 // resolve through archives
 ln.deepResolve(drive, swarmer, archive, path, (err, result) => {})
@@ -37,21 +37,21 @@ You can pass a `meta` object to store it in the symlink.
 
 #### `ln.readlink(archive, path, cb)`
 
-Get the archiveKey stored inside a symlink
+Get the link data stored inside a symlink.
 
 #### `ln.resolve(archive, path, cb)`
 
 Resolve a path. Returns an archive and a path within that archive with `cb(err, linkedArchiveKey, pathWithinLinkedArchive)`
 
-* If there's a symlink encountered in the path. `cb(err, linkKey, pathWithinLinkedArchive)` will be invoked.
-* If there's no symlink in the path, `cb(err, archive.key, path)` will be called.
+* If there's a symlink encountered in the path. `cb(err, link, pathWithinLinkedArchive)` will be invoked.
+* If there's no symlink in the path, `cb(err, {}, path)` will be called.
 
 for example:
 
 ```js
 ln.link(archive, 'foo/bar', '<LINK_KEY>', (err) => {
     ln.resolve(archive, 'foo/bar/baz', (err, link, path) => {
-      // link === '<LINK_KEY>'
+      // link === {link: '<LINK_KEY>', meta: {...}}
       // path === 'baz'
     })
 })

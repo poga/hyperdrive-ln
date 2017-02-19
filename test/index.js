@@ -19,7 +19,7 @@ tape('link', function (t) {
 
       ln.readlink(archive, entries[0], (err, info) => {
         t.error(err)
-        t.same(info, 'foo')
+        t.same(info, {link: 'foo', meta: undefined})
         t.end()
       })
     })
@@ -37,9 +37,9 @@ tape('link with metadata', function (t) {
       t.error(err)
       t.same(entries[0].name, 'symlink')
 
-      ln.readlink(archive, entries[0], (err, key) => {
+      ln.readlink(archive, entries[0], (err, info) => {
         t.error(err)
-        t.same(key, 'foo')
+        t.same(info, {link: 'foo', meta: {bar: 'baz'}})
 
         collect(archive.createFileReadStream(entries[0]), (err, data) => {
           t.error(err)
@@ -62,7 +62,7 @@ tape('resolve', function (t) {
 
       ln.resolve(archive, '/foo/link/bar/baz.txt', (err, link, nextPath) => {
         t.error(err)
-        t.same(link, linkedArchive.key.toString('hex'))
+        t.same(link, {link: linkedArchive.key.toString('hex'), meta: undefined})
         t.same(nextPath, 'bar/baz.txt')
         t.end()
       })
@@ -78,7 +78,7 @@ tape('resolve to file without link', function (t) {
   function test () {
     ln.resolve(archive, '/foo/link', (err, link, nextPath) => {
       t.error(err)
-      t.same(link, archive.key.toString('hex'))
+      t.same(link, {})
       t.same(nextPath, '/foo/link')
       t.end()
     })

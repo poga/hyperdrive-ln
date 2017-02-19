@@ -21,6 +21,6 @@
     "tape": "^4.6.3"
   },
   "scripts": {
-    "test": "node test/*.js"
+    "test": "tape test/*.js"
   }
 }
